@@ -21,7 +21,9 @@ export async function POST(request) {
       );
     }
 
-    const anthropic = new Anthropic({ apiKey: "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" });
+    const anthropic = new Anthropic({
+      apiKey: process.env.ANTHROPIC_API_KEY,
+    });
 
     const message = await anthropic.messages.create({
       model: "claude-haiku-4-5-20251001",
