@@ -186,6 +186,57 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Stats Bar */}
+        <section className="border-y border-slate-200 bg-slate-50/50">
+          <div className="mx-auto max-w-4xl px-6 py-6">
+            <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-4">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-slate-700">60 seconds</span>
+              </div>
+              <div className="hidden sm:block h-4 w-px bg-slate-200" />
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-slate-700">6-section analysis</span>
+              </div>
+              <div className="hidden sm:block h-4 w-px bg-slate-200" />
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-slate-700">Ready-to-submit letters</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Feature Cards */}
+        <section className="bg-white py-14 px-6">
+          <div className="mx-auto max-w-4xl">
+            <div className="grid gap-6 sm:grid-cols-3">
+              <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 className="text-base font-semibold text-[#0f172a]">
+                  Violation Analysis
+                </h3>
+                <p className="mt-3 text-sm text-slate-600 leading-relaxed">
+                  Instant identification of FDA regulation breaches
+                </p>
+              </div>
+              <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 className="text-base font-semibold text-[#0f172a]">
+                  Resolution Pathway
+                </h3>
+                <p className="mt-3 text-sm text-slate-600 leading-relaxed">
+                  Step-by-step compliance roadmap
+                </p>
+              </div>
+              <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 className="text-base font-semibold text-[#0f172a]">
+                  Response Letters
+                </h3>
+                <p className="mt-3 text-sm text-slate-600 leading-relaxed">
+                  Professional FDA-ready documentation
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Input Section */}
         <section className="px-6 pb-16">
           <div className="mx-auto max-w-4xl">
