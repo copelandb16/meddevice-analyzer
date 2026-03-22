@@ -92,7 +92,7 @@ export default function Home() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `clearanceiq-report-${new Date().toISOString().slice(0, 10)}.md`;
+    a.download = `ingressa-report-${new Date().toISOString().slice(0, 10)}.md`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -163,10 +163,10 @@ export default function Home() {
           <LogoIcon className="h-9 w-9 text-white flex-shrink-0" />
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-white">
-              ClearanceIQ
+              Ingressa
             </h1>
             <p className="text-[#3b82f6] text-sm font-medium mt-0.5">
-              FDA Import Alert Intelligence
+              FDA Import Alert Intelligence for Medical Device Importers
             </p>
           </div>
         </div>
@@ -262,7 +262,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="w-full bg-[#0f172a] py-8">
         <p className="text-center text-sm text-white">
-          ClearanceIQ © 2025 — FDA Import Alert Intelligence
+          Ingressa © 2025 — FDA Import Alert Intelligence for Medical Device Importers
         </p>
       </footer>
     </div>

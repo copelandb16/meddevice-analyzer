@@ -12,7 +12,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "ClearanceIQ - FDA Import Alert Analyzer",
+  title: "Ingressa - FDA Import Alert Analyzer",
   description: "Analyze FDA Import Alerts with expert regulatory insights",
 };
 
