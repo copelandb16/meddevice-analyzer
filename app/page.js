@@ -156,7 +156,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen flex flex-col bg-[#f8fafc]">
       {/* Header */}
       <header className="w-full bg-[#0f172a] px-8 py-6">
         <div className="mx-auto max-w-4xl flex items-center gap-3">
@@ -174,7 +174,7 @@ export default function Home() {
 
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="bg-white py-16 px-6">
+        <section className="border-b border-[#0f172a]/20 bg-white py-16 px-6">
           <div className="mx-auto max-w-3xl text-center">
             <h2 className="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
               Analyze FDA Import Alerts in 60 Seconds
@@ -187,29 +187,29 @@ export default function Home() {
         </section>
 
         {/* Stats Bar */}
-        <section className="border-y border-slate-200 bg-slate-50/50">
-          <div className="mx-auto max-w-4xl px-6 py-6">
+        <section className="border-y border-slate-200 bg-white">
+          <div className="mx-auto max-w-4xl px-6 py-7">
             <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-4">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-slate-700">60 seconds</span>
+                <span className="text-base font-bold text-slate-800">60 seconds</span>
               </div>
-              <div className="hidden sm:block h-4 w-px bg-slate-200" />
+              <div className="hidden sm:block h-5 w-px bg-slate-200" />
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-slate-700">6-section analysis</span>
+                <span className="text-base font-bold text-slate-800">6-section analysis</span>
               </div>
-              <div className="hidden sm:block h-4 w-px bg-slate-200" />
+              <div className="hidden sm:block h-5 w-px bg-slate-200" />
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-slate-700">Ready-to-submit letters</span>
+                <span className="text-base font-bold text-slate-800">Ready-to-submit letters</span>
               </div>
             </div>
           </div>
         </section>
 
         {/* Feature Cards */}
-        <section className="bg-white py-14 px-6">
+        <section className="bg-[#f8fafc] py-14 px-6">
           <div className="mx-auto max-w-4xl">
             <div className="grid gap-6 sm:grid-cols-3">
-              <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="rounded-lg border border-slate-200 border-l-4 border-l-[#3b82f6] bg-white p-6 shadow-sm">
                 <h3 className="text-base font-semibold text-[#0f172a]">
                   Violation Analysis
                 </h3>
@@ -217,7 +217,7 @@ export default function Home() {
                   Instant identification of FDA regulation breaches
                 </p>
               </div>
-              <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="rounded-lg border border-slate-200 border-l-4 border-l-[#3b82f6] bg-white p-6 shadow-sm">
                 <h3 className="text-base font-semibold text-[#0f172a]">
                   Resolution Pathway
                 </h3>
@@ -225,7 +225,7 @@ export default function Home() {
                   Step-by-step compliance roadmap
                 </p>
               </div>
-              <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="rounded-lg border border-slate-200 border-l-4 border-l-[#3b82f6] bg-white p-6 shadow-sm">
                 <h3 className="text-base font-semibold text-[#0f172a]">
                   Response Letters
                 </h3>
