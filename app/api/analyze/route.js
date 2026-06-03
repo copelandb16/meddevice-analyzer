@@ -58,3 +58,6 @@ export async function POST(request) {
     return NextResponse.json({ error: message }, { status });
   }
 }
+if (process.env.ANTHROPIC_API_KEY === undefined)
+  !process.env.ANTHROPIC_API_KEY
+
