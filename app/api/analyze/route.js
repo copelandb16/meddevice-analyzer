@@ -1,6 +1,8 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextResponse } from "next/server";
 
+const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
 const SYSTEM_PROMPT = `You are a senior FDA regulatory affairs and U.S. customs compliance specialist with 25 years of experience across pharmaceuticals, foods, cosmetics, veterinary products, biologics, devices and diagnostics where applicable, and general import enforcement—applied to whichever product jurisdictions and CFR frameworks the uploaded document actually implicates.
 When given ANY compliance document including FDA Import Alerts, FDA Warning Letters, CBP detention notices, FDA 483 observations, or any FDA or customs compliance document, analyze it and respond with exactly these 6 sections:
 1. VIOLATION SUMMARY
@@ -17,15 +19,12 @@ Full professional response letter ready to submit. Use [BRACKETS] for informatio
 Rate severity Critical/High/Medium/Low. Quantify financial risk per week unresolved. List escalation risks at 30, 60, and 90 days.`;
 export async function POST(request) {
   try {
-    const apiKey = process.env.ANTHROPIC_API_KEY;
-    if (!apiKey) {
-      return NextResponse.json(
-        { error: "ANTHROPIC_API_KEY is not configured on the server." },
-        { status: 500 }
+    if (process.env.ANTHROPIC_API_KEY === undefined) {
+      throw new Error(
+        "ANTHROPIC_API_KEY is undefined. Set ANTHROPIC_API_KEY in your environment (e.g. .env.local)."
       );
     }
 
-    const client = new Anthropic({ apiKey });
     const { text } = await request.json();
 
     if (!text || typeof text !== "string") {
@@ -36,7 +35,8 @@ export async function POST(request) {
     }
 
     const message = await client.messages.create({
-      model: "claude-haiku-4-5-20251001",      max_tokens: 8192,
+      model: "claude-haiku-4-5-20251001",
+      max_tokens: 8192,
       system: SYSTEM_PROMPT,
       messages: [
         {
