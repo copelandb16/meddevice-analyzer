@@ -1,321 +1,132 @@
-"use client";
+import AnalyzePanel from "./components/AnalyzePanel";
 
-import { useState } from "react";
-import ReactMarkdown from "react-markdown";
-
-function LogoIcon({ className }) {
+function IconPaste(props) {
   return (
     <svg
-      xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth="1.75"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className={className}
+      aria-hidden
+      {...props}
     >
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+      <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+      <path d="M15 11h-5" />
+      <path d="M15 15h-5" />
     </svg>
   );
 }
 
-function ArrowIcon({ className }) {
+function IconAnalyze(props) {
   return (
     <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 20 20"
-      fill="currentColor"
-      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+      {...props}
     >
-      <path
-        fillRule="evenodd"
-        d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z"
-        clipRule="evenodd"
-      />
+      <path d="M12 2v4" />
+      <path d="M12 18v4" />
+      <path d="M4.93 4.93l2.83 2.83" />
+      <path d="M16.24 16.24l2.83 2.83" />
+      <path d="M2 12h4" />
+      <path d="M18 12h4" />
+      <path d="M4.93 19.07l2.83-2.83" />
+      <path d="M16.24 7.76l2.83-2.83" />
+      <circle cx="12" cy="12" r="4" />
     </svg>
   );
 }
 
-function DownloadIcon({ className }) {
+function IconReport(props) {
   return (
     <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 20 20"
-      fill="currentColor"
-      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+      {...props}
     >
-      <path d="M10.75 2.75a.75.75 0 00-1.5 0v8.614L6.295 8.235a.75.75 0 10-1.09 1.03l4.25 4.5a.75.75 0 001.09 0l4.25-4.5a.75.75 0 00-1.09-1.03l-2.955 3.129V2.75z" />
-      <path d="M3.5 12.75a.75.75 0 00-1.5 0v2.5A2.75 2.75 0 004.75 18h10.5A2.75 2.75 0 0018 15.25v-2.5a.75.75 0 00-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5z" />
+      <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+      <path d="M14 2v6h6" />
+      <path d="M8 13h8" />
+      <path d="M8 17h8" />
+      <path d="M8 9h4" />
     </svg>
   );
 }
 
 export default function Home() {
-  const [text, setText] = useState("");
-  const [results, setResults] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  const handleAnalyze = async () => {
-    if (!text.trim()) return;
-
-    setLoading(true);
-    setError(null);
-    setResults(null);
-
-    try {
-      const res = await fetch("/api/analyze", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "Analysis failed");
-      }
-
-      setResults(data);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDownloadReport = () => {
-    const content =
-      typeof results === "string" ? results : results?.analysis || "";
-    const blob = new Blob([content], { type: "text/markdown" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `ingressa-report-${new Date().toISOString().slice(0, 10)}.md`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
-
-  const darkText = "text-[#1e293b]";
-  const reportComponents = {
-    h1: ({ children }) => (
-      <h1 className={`text-lg font-semibold ${darkText} mb-3`}>{children}</h1>
-    ),
-    h2: ({ children }) => (
-      <div className="border-t border-slate-200 pt-6 mt-6 first:mt-0 first:pt-0 first:border-t-0">
-        <h2 className={`text-base font-semibold ${darkText} mb-3`}>
-          {children}
-        </h2>
-      </div>
-    ),
-    h3: ({ children }) => (
-      <h3 className={`text-sm font-semibold ${darkText} mt-4 mb-2`}>
-        {children}
-      </h3>
-    ),
-    h4: ({ children }) => (
-      <h4 className={`text-sm font-semibold ${darkText} mt-3 mb-2`}>
-        {children}
-      </h4>
-    ),
-    p: ({ children }) => (
-      <p className={`${darkText} leading-relaxed mb-4 last:mb-0`}>{children}</p>
-    ),
-    li: ({ children }) => (
-      <li className={`${darkText} leading-relaxed mb-1`}>{children}</li>
-    ),
-    ul: ({ children }) => (
-      <ul className={`list-disc pl-5 mb-4 space-y-1 ${darkText}`}>
-        {children}
-      </ul>
-    ),
-    ol: ({ children }) => (
-      <ol className={`list-decimal pl-5 mb-4 space-y-1 ${darkText}`}>
-        {children}
-      </ol>
-    ),
-    strong: ({ children }) => (
-      <strong className={`font-semibold ${darkText}`}>{children}</strong>
-    ),
-    em: ({ children }) => (
-      <em className={darkText}>{children}</em>
-    ),
-    blockquote: ({ children }) => (
-      <blockquote className={`border-l-4 border-slate-200 pl-4 my-4 ${darkText}`}>
-        {children}
-      </blockquote>
-    ),
-    code: ({ children }) => (
-      <code className={`${darkText} bg-slate-100 px-1 py-0.5 rounded text-sm`}>
-        {children}
-      </code>
-    ),
-  };
-
   return (
-    <div className="min-h-screen flex flex-col bg-[#f8fafc]">
-      {/* Header */}
-      <header className="w-full bg-[#0f172a] px-8 py-6">
-        <div className="mx-auto max-w-4xl flex items-center gap-3">
-          <LogoIcon className="h-9 w-9 text-white flex-shrink-0" />
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight text-white">
-              Ingressa
-            </h1>
-            <p className="text-[#3b82f6] text-sm font-medium mt-0.5">
-              FDA Import Alert Intelligence for Medical Device Importers
-            </p>
+    <>
+      <section className="border-b border-neutral-100 bg-white">
+        <div className="mx-auto max-w-6xl px-6 pb-24 pt-20 lg:pb-28 lg:pt-24">
+          <h1 className="max-w-3xl text-4xl font-bold tracking-tight text-neutral-950 sm:text-5xl sm:leading-[1.1] lg:text-[3.25rem]">
+            Analyze Any FDA Import Alert in 60 Seconds
+          </h1>
+          <p className="mt-6 max-w-2xl text-lg leading-relaxed text-neutral-600">
+            Instant violation analysis, resolution pathways, and ready-to-submit
+            response letters for importers, brokers and compliance teams
+          </p>
+          <div className="mt-10">
+            <a
+              href="#analyze"
+              className="inline-flex h-11 items-center justify-center rounded-md bg-blue-600 px-5 text-[15px] font-medium text-white hover:bg-blue-700"
+            >
+              Analyze an Alert
+            </a>
           </div>
         </div>
-      </header>
+      </section>
 
-      <main className="flex-1">
-        {/* Hero Section */}
-        <section className="border-b border-[#0f172a]/20 bg-white py-16 px-6">
-          <div className="mx-auto max-w-3xl text-center">
-            <h2 className="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
-              Analyze FDA Import Alerts in 60 Seconds
-            </h2>
-            <p className="mt-5 text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto">
-              Get instant violation analysis, resolution pathways, and
-              ready-to-submit response letters
-            </p>
-          </div>
-        </section>
-
-        {/* Stats Bar */}
-        <section className="border-y border-slate-200 bg-white">
-          <div className="mx-auto max-w-4xl px-6 py-7">
-            <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-4">
-              <div className="flex items-center gap-2">
-                <span className="text-base font-bold text-slate-800">60 seconds</span>
-              </div>
-              <div className="hidden sm:block h-5 w-px bg-slate-200" />
-              <div className="flex items-center gap-2">
-                <span className="text-base font-bold text-slate-800">6-section analysis</span>
-              </div>
-              <div className="hidden sm:block h-5 w-px bg-slate-200" />
-              <div className="flex items-center gap-2">
-                <span className="text-base font-bold text-slate-800">Ready-to-submit letters</span>
-              </div>
+      <section className="border-b border-neutral-100 bg-neutral-50">
+        <div className="mx-auto max-w-6xl px-6 py-20 lg:py-24">
+          <h2 className="sr-only">How it works</h2>
+          <div className="grid gap-12 md:grid-cols-3 md:gap-8 lg:gap-12">
+            <div className="flex flex-col items-center text-center">
+              <IconPaste className="h-9 w-9 text-neutral-800" />
+              <h3 className="mt-5 text-[15px] font-semibold text-neutral-950">
+                Step 1: Paste Your Alert
+              </h3>
+              <p className="mt-2 text-[14px] leading-relaxed text-neutral-600">
+                Drop in the citation, DWPE excerpt, or full alert text—nothing to
+                install.
+              </p>
+            </div>
+            <div className="flex flex-col items-center text-center">
+              <IconAnalyze className="h-9 w-9 text-neutral-800" />
+              <h3 className="mt-5 text-[15px] font-semibold text-neutral-950">
+                Step 2: Click Analyze
+              </h3>
+              <p className="mt-2 text-[14px] leading-relaxed text-neutral-600">
+                AlertIQ parses the breach, citations, and next actions in one pass.
+              </p>
+            </div>
+            <div className="flex flex-col items-center text-center">
+              <IconReport className="h-9 w-9 text-neutral-800" />
+              <h3 className="mt-5 text-[15px] font-semibold text-neutral-950">
+                Step 3: Get Your Report
+              </h3>
+              <p className="mt-2 text-[14px] leading-relaxed text-neutral-600">
+                Structured summary, resolution steps, drafting support, export as
+                PDF.
+              </p>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Feature Cards */}
-        <section className="bg-[#f8fafc] py-14 px-6">
-          <div className="mx-auto max-w-4xl">
-            <div className="grid gap-6 sm:grid-cols-3">
-              <div className="rounded-lg border border-slate-200 border-l-4 border-l-[#3b82f6] bg-white p-6 shadow-sm">
-                <h3 className="text-base font-semibold text-[#0f172a]">
-                  Violation Analysis
-                </h3>
-                <p className="mt-3 text-sm text-slate-600 leading-relaxed">
-                  Instant identification of FDA regulation breaches
-                </p>
-              </div>
-              <div className="rounded-lg border border-slate-200 border-l-4 border-l-[#3b82f6] bg-white p-6 shadow-sm">
-                <h3 className="text-base font-semibold text-[#0f172a]">
-                  Resolution Pathway
-                </h3>
-                <p className="mt-3 text-sm text-slate-600 leading-relaxed">
-                  Step-by-step compliance roadmap
-                </p>
-              </div>
-              <div className="rounded-lg border border-slate-200 border-l-4 border-l-[#3b82f6] bg-white p-6 shadow-sm">
-                <h3 className="text-base font-semibold text-[#0f172a]">
-                  Response Letters
-                </h3>
-                <p className="mt-3 text-sm text-slate-600 leading-relaxed">
-                  Professional FDA-ready documentation
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Input Section */}
-        <section className="px-6 pb-16">
-          <div className="mx-auto max-w-4xl">
-            <div className="rounded-xl border border-slate-200 bg-white p-8 shadow-lg shadow-slate-200/50">
-              {error && (
-                <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
-                  {error}
-                </div>
-              )}
-              <label
-                htmlFor="alert-input"
-                className="mb-3 block text-sm font-semibold text-slate-700"
-              >
-                Paste your FDA Import Alert
-              </label>
-              <textarea
-                id="alert-input"
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                placeholder="Paste the full text of the FDA Import Alert here..."
-                className="mb-6 min-h-[200px] w-full resize-y rounded-lg border border-slate-300 bg-white px-4 py-3.5 text-slate-900 text-[15px] leading-relaxed placeholder:text-slate-400 focus:border-[#3b82f6] focus:outline-none focus:ring-2 focus:ring-[#3b82f6]/20"
-                disabled={loading}
-              />
-              <button
-                onClick={handleAnalyze}
-                disabled={loading || !text.trim()}
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#3b82f6] px-6 py-4 text-base font-bold text-white shadow-sm transition-all hover:bg-[#2563eb] disabled:pointer-events-none disabled:opacity-50"
-              >
-                {loading ? (
-                  "Analyzing…"
-                ) : (
-                  <>
-                    Analyze Document
-                    <ArrowIcon className="h-5 w-5" />
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        </section>
-
-        {/* Results Section - Only show when results exist */}
-        {results && (
-          <section className="px-6 pb-20">
-            <div className="mx-auto max-w-4xl">
-              <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg shadow-slate-200/50">
-                <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
-                  <p className="text-sm font-semibold text-slate-600">
-                    Analysis Report
-                  </p>
-                  <button
-                    onClick={handleDownloadReport}
-                    className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:bg-slate-50 hover:border-slate-400"
-                  >
-                    <DownloadIcon className="h-4 w-4" />
-                    Download Report
-                  </button>
-                </div>
-                <div className="px-6 py-8">
-                  <div className="prose prose-slate max-w-none text-[#1e293b] [&_h1]:text-[#1e293b] [&_h2]:text-[#1e293b] [&_h3]:text-[#1e293b] [&_h4]:text-[#1e293b] [&_p]:text-[#1e293b] [&_li]:text-[#1e293b] [&_strong]:text-[#1e293b] [&_em]:text-[#1e293b] [&_a]:text-[#1e293b] [&_span]:text-[#1e293b]">
-                    <ReactMarkdown components={reportComponents}>
-                      {typeof results === "string"
-                        ? results
-                        : results.analysis}
-                    </ReactMarkdown>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
-      </main>
-
-      {/* Footer */}
-      <footer className="w-full bg-[#0f172a] py-8">
-        <p className="text-center text-sm text-white">
-          Ingressa © 2025 — FDA Import Alert Intelligence for Medical Device Importers
-        </p>
-      </footer>
-    </div>
+      <AnalyzePanel />
+    </>
   );
 }

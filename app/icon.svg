@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" role="img" aria-labelledby="alertiq-logo-title">
+  <title id="alertiq-logo-title">AlertIQ</title>
+  <rect width="32" height="32" rx="6" fill="#2563eb"/>
+  <path fill="#fff" fillRule="evenodd" d="M10 23V9h12v14H10zm3-11h6v2h-6v-2zm0 4h6v2h-6v-2zm0 4h6v2h-6v-2z"/>
+</svg>
