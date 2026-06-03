@@ -75,8 +75,7 @@ export default function Home() {
             Analyze Any FDA Import Alert in 60 Seconds
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-relaxed text-neutral-600">
-            Instant violation analysis, resolution pathways, and ready-to-submit
-            response letters for importers, brokers and compliance teams
+            FDA Import Alert Intelligence for Importers, Brokers & Compliance Teams
           </p>
           <div className="mt-10">
             <a
