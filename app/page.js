@@ -72,11 +72,19 @@ export default function Home() {
       <section className="border-b border-neutral-100 bg-white">
         <div className="mx-auto max-w-6xl px-6 pb-24 pt-20 lg:pb-28 lg:pt-24">
           <h1 className="max-w-3xl text-4xl font-bold tracking-tight text-neutral-950 sm:text-5xl sm:leading-[1.1] lg:text-[3.25rem]">
-            Analyze Any FDA Import Alert in 60 Seconds
+          Analyze Any FDA Import Alert & Draft Your Response Letter in 60 Seconds
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-relaxed text-neutral-600">
             FDA Import Alert Intelligence for Importers, Brokers & Compliance Teams
           </p>
+          <div className="mt-5 max-w-2xl">
+            <p className="text-lg font-medium text-neutral-900">
+              First analysis is 100% free. No credit card required.
+            </p>
+            <p className="mt-2 text-sm text-neutral-500">
+              Used by U.S. customs brokers processing food, pharma, and cosmetics imports.
+            </p>
+          </div>
           <div className="mt-10">
             <a
               href="#analyze"
