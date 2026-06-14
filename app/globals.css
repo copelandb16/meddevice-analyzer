@@ -3,6 +3,9 @@
 :root {
   --background: #ffffff;
   --foreground: #0a0a0a;
+  --accent: #7c6ff0;
+  --accent-strong: #6d5ee8;
+  --accent-soft: #8b7ff5;
 }
 
 @theme inline {
@@ -15,4 +18,80 @@
 body {
   background: var(--background);
   color: var(--foreground);
+}
+
+/* Soft light-purple radial glow / mesh for the hero */
+.hero-mesh {
+  background-image:
+    radial-gradient(
+      55% 60% at 50% 0%,
+      rgba(124, 111, 240, 0.16) 0%,
+      rgba(124, 111, 240, 0.06) 38%,
+      rgba(124, 111, 240, 0) 70%
+    ),
+    radial-gradient(
+      40% 50% at 85% 10%,
+      rgba(139, 127, 245, 0.1) 0%,
+      rgba(139, 127, 245, 0) 60%
+    ),
+    radial-gradient(
+      45% 55% at 12% 18%,
+      rgba(167, 139, 250, 0.08) 0%,
+      rgba(167, 139, 250, 0) 60%
+    );
+}
+
+/* Gradient purple CTA with soft glow on hover */
+.btn-purple {
+  background-image: linear-gradient(
+    180deg,
+    var(--accent-soft) 0%,
+    var(--accent-strong) 100%
+  );
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.25) inset,
+    0 8px 24px -8px rgba(124, 111, 240, 0.5);
+  transition:
+    box-shadow 0.25s ease,
+    transform 0.25s ease,
+    filter 0.25s ease;
+}
+
+.btn-purple:hover {
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.3) inset,
+    0 14px 36px -8px rgba(124, 111, 240, 0.7);
+  transform: translateY(-1px);
+  filter: saturate(1.05);
+}
+
+.btn-purple:active {
+  transform: translateY(0);
+}
+
+/* Scroll reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .btn-purple {
+    transition: none;
+  }
 }
