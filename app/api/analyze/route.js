@@ -1,5 +1,11 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import {
+  canUserAnalyze,
+  getOrCreateSubscription,
+  markFreeAnalysisUsed,
+} from "@/lib/subscription";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -17,12 +23,32 @@ Complete bulleted list of every document needed organized by category.
 Full professional response letter ready to submit. Use [BRACKETS] for information the user must fill in.
 6. RISK ASSESSMENT
 Rate severity Critical/High/Medium/Low. Quantify financial risk per week unresolved. List escalation risks at 30, 60, and 90 days.`;
+
 export async function POST(request) {
   try {
     if (process.env.ANTHROPIC_API_KEY === undefined) {
       throw new Error(
         "ANTHROPIC_API_KEY is undefined. Set ANTHROPIC_API_KEY in your environment (e.g. .env.local)."
       );
+    }
+
+    const { userId } = await auth();
+    let subscription = null;
+
+    if (userId) {
+      const user = await currentUser();
+      const email = user?.emailAddresses?.[0]?.emailAddress ?? null;
+      subscription = await getOrCreateSubscription(userId, email);
+
+      if (!canUserAnalyze(subscription)) {
+        return NextResponse.json(
+          {
+            error: "Subscription required for additional analyses.",
+            code: "SUBSCRIPTION_REQUIRED",
+          },
+          { status: 402 }
+        );
+      }
     }
 
     const { text } = await request.json();
@@ -49,6 +75,10 @@ export async function POST(request) {
     const content = message.content.find((block) => block.type === "text");
     const analysis = content ? content.text : "";
 
+    if (userId && subscription?.status !== "active") {
+      await markFreeAnalysisUsed(userId);
+    }
+
     return NextResponse.json({ analysis });
   } catch (error) {
     console.error("Analysis error:", error);
@@ -58,6 +88,3 @@ export async function POST(request) {
     return NextResponse.json({ error: message }, { status });
   }
 }
-if (process.env.ANTHROPIC_API_KEY === undefined)
-  !process.env.ANTHROPIC_API_KEY
-
