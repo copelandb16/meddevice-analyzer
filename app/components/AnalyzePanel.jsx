@@ -1,14 +1,10 @@
 ﻿"use client";
 
-import { useAuth } from "@clerk/nextjs";
 import { useCallback, useEffect, useState } from "react";
 
-const FALLBACK_STRIPE_LINK =
-  process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK ||
-  "https://buy.stripe.com/7sY8wP15c3upfLm9bXaEE00";
-const FREE_USED_KEY = "alertiq_free_used";
+const STRIPE_LINK = "https://buy.stripe.com/7sY8wP15c3upfLm9bXaEE00";
 
-function PaywallModal({ onClose, onSubscribe, subscribing }) {
+function PaywallModal({ onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
       <div className="w-full max-w-md rounded-xl border border-neutral-200 bg-white p-8 shadow-xl">
@@ -16,17 +12,18 @@ function PaywallModal({ onClose, onSubscribe, subscribing }) {
           Your first analysis was free
         </h2>
         <p className="mt-3 text-[15px] leading-relaxed text-neutral-600">
-          Subscribe for $99.99/month for unlimited analyses
+          Subscribe for <strong>$99/month</strong> for unlimited FDA import alert
+          analyses, resolution pathways, and ready-to-submit response letters.
         </p>
         <div className="mt-6 flex flex-col gap-3">
-          <button
-            type="button"
-            onClick={onSubscribe}
-            disabled={subscribing}
-            className="inline-flex h-11 w-full items-center justify-center rounded-md bg-green-600 text-[15px] font-medium text-white hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-60"
+          
+            href={STRIPE_LINK}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex h-11 w-full items-center justify-center rounded-md bg-blue-600 text-[15px] font-medium text-white hover:bg-blue-700"
           >
-            {subscribing ? "Redirecting…" : "Subscribe Now"}
-          </button>
+            Subscribe Now — $99/month
+          </a>
           <button
             type="button"
             onClick={onClose}
@@ -41,69 +38,26 @@ function PaywallModal({ onClose, onSubscribe, subscribing }) {
 }
 
 export default function AnalyzePanel() {
-  const { isSignedIn } = useAuth();
   const [documentText, setDocumentText] = useState("");
   const [analysis, setAnalysis] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showPaywall, setShowPaywall] = useState(false);
-  const [subscribing, setSubscribing] = useState(false);
   const [hasUsedFree, setHasUsedFree] = useState(false);
-  const [isSubscribed, setIsSubscribed] = useState(false);
-
-  const refreshAccess = useCallback(async () => {
-    try {
-      const res = await fetch("/api/subscription");
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) return;
-
-      if (data.signedIn) {
-        setIsSubscribed(data.status === "active");
-        setHasUsedFree(Boolean(data.freeAnalysisUsed));
-        return;
-      }
-
-      const usedLocally = localStorage.getItem(FREE_USED_KEY) === "true";
-      setHasUsedFree(usedLocally);
-      setIsSubscribed(false);
-    } catch {
-      const usedLocally = localStorage.getItem(FREE_USED_KEY) === "true";
-      setHasUsedFree(usedLocally);
-    }
-  }, []);
 
   useEffect(() => {
-    refreshAccess();
-  }, [refreshAccess, isSignedIn]);
-
-  const startCheckout = useCallback(async () => {
-    setSubscribing(true);
-    try {
-      if (!isSignedIn) {
-        window.location.href = "/sign-in?redirect_url=" + encodeURIComponent("/#analyze");
-        return;
-      }
-
-      const res = await fetch("/api/stripe/checkout", { method: "POST" });
-      const data = await res.json().catch(() => ({}));
-
-      if (res.ok && data.url) {
-        window.location.href = data.url;
-        return;
-      }
-
-      window.location.href = FALLBACK_STRIPE_LINK;
-    } catch {
-      window.location.href = FALLBACK_STRIPE_LINK;
-    } finally {
-      setSubscribing(false);
-    }
-  }, [isSignedIn]);
+    const used = localStorage.getItem("alertiq_free_used");
+    if (used === "true") setHasUsedFree(true);
+  }, []);
 
   const downloadPdf = useCallback(async () => {
     if (!analysis.trim()) return;
     const { jsPDF } = await import("jspdf");
-    const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+    const doc = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4",
+    });
     const margin = 15;
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
@@ -116,7 +70,7 @@ export default function AnalyzePanel() {
     y += 10;
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
-    doc.text("Generated " + new Date().toLocaleString(), margin, y);
+    doc.text(`Generated ${new Date().toLocaleString()}`, margin, y);
     y += 8;
     doc.setFontSize(11);
     const lines = doc.splitTextToSize(analysis.trim(), maxWidth);
@@ -129,19 +83,14 @@ export default function AnalyzePanel() {
       y += lineHeight;
     }
     const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, "");
-    doc.save("alertiq-report-" + stamp + ".pdf");
+    doc.save(`alertiq-report-${stamp}.pdf`);
   }, [analysis]);
-
-  function shouldBlockAnalysis() {
-    if (isSubscribed) return false;
-    return hasUsedFree;
-  }
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError(null);
 
-    if (shouldBlockAnalysis()) {
+    if (hasUsedFree) {
       setShowPaywall(true);
       return;
     }
@@ -154,7 +103,6 @@ export default function AnalyzePanel() {
 
     setLoading(true);
     setAnalysis("");
-
     try {
       const res = await fetch("/api/analyze", {
         method: "POST",
@@ -162,34 +110,18 @@ export default function AnalyzePanel() {
         body: JSON.stringify({ text }),
       });
       const data = await res.json().catch(() => ({}));
-
-      if (res.status === 402 || data.code === "SUBSCRIPTION_REQUIRED") {
-        setHasUsedFree(true);
-        setShowPaywall(true);
-        return;
-      }
-
       if (!res.ok) {
         setError(typeof data.error === "string" ? data.error : "Analysis failed.");
         return;
       }
-
       if (typeof data.analysis !== "string") {
         setError("Unexpected response from the analyzer.");
         return;
       }
-
       setAnalysis(data.analysis);
-
-      if (!isSubscribed) {
-        if (!isSignedIn) {
-          localStorage.setItem(FREE_USED_KEY, "true");
-        }
-        setHasUsedFree(true);
-        setTimeout(() => setShowPaywall(true), 3000);
-      }
-
-      await refreshAccess();
+      localStorage.setItem("alertiq_free_used", "true");
+      setHasUsedFree(true);
+      setTimeout(() => setShowPaywall(true), 3000);
     } catch {
       setError("Could not reach the server. Try again.");
     } finally {
@@ -197,17 +129,9 @@ export default function AnalyzePanel() {
     }
   }
 
-  const blocked = shouldBlockAnalysis();
-
   return (
     <>
-      {showPaywall ? (
-        <PaywallModal
-          onClose={() => setShowPaywall(false)}
-          onSubscribe={startCheckout}
-          subscribing={subscribing}
-        />
-      ) : null}
+      {showPaywall && <PaywallModal onClose={() => setShowPaywall(false)} />}
       <section
         id="analyze"
         className="scroll-mt-6 bg-white pb-24 pt-20 lg:pb-28 lg:pt-24"
@@ -227,12 +151,18 @@ export default function AnalyzePanel() {
                 value={documentText}
                 onChange={(event) => setDocumentText(event.target.value)}
                 rows={10}
-                placeholder="Paste your FDA Import Alert text here..."
+                placeholder="Paste the FULL text of your FDA import alert here — the violations, product description, and charge. Not just the alert number."
                 className="w-full resize-y rounded-md border border-neutral-200 bg-white px-3 py-3 text-[15px] leading-relaxed text-neutral-900 outline-none placeholder:text-neutral-400 focus:border-neutral-900"
               />
               {error ? (
                 <p className="text-sm text-red-600" role="alert">
                   {error}
+                </p>
+              ) : null}
+              {loading ? (
+                <p className="text-center text-sm text-neutral-500" role="status">
+                  Reading the alert, identifying violations, and drafting your
+                  response letter… this usually takes about a minute.
                 </p>
               ) : null}
               <button
@@ -241,17 +171,24 @@ export default function AnalyzePanel() {
                 className="inline-flex h-11 w-full items-center justify-center rounded-md bg-blue-600 text-[15px] font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {loading
-                  ? "Analyzing..."
-                  : blocked
-                    ? "Subscribe to Analyze"
-                    : "Analyze an Alert"}
+                  ? "Analyzing your alert — hang tight…"
+                  : hasUsedFree
+                  ? "Subscribe to Analyze"
+                  : "Analyze an Alert"}
               </button>
               <p className="text-center text-sm text-neutral-500">
-                {isSubscribed
-                  ? "Unlimited analyses included with your subscription."
-                  : blocked
-                    ? "Subscribe for $99.99/month for unlimited analyses."
-                    : "No signup required for your first analysis."}
+                {hasUsedFree ? (
+                  
+                    href={STRIPE_LINK}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 underline underline-offset-4"
+                  >
+                    Subscribe for $99/month for unlimited analyses
+                  </a>
+                ) : (
+                  "No signup required for your first analysis."
+                )}
               </p>
             </form>
           </div>
@@ -279,3 +216,5 @@ export default function AnalyzePanel() {
     </>
   );
 }
+
+
